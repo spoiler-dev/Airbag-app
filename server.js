@@ -41,7 +41,7 @@ app.post('/login', urlencodedParser, function (req, res) {
   })
 })
 
-//  查询
+//  查询所有文章
 app.get('/list', function (req, res) {
   console.log("/查询请求")
   MongoClient.connect(url, function (err, db) {
@@ -61,7 +61,7 @@ app.get('/list', function (req, res) {
   })
 })
 
-//  单条查询
+//  查询单篇文章
 app.get('/markdown', function (req, res) {
   console.log("/单条请求")
   console.log(req.query)
@@ -83,7 +83,7 @@ app.get('/markdown', function (req, res) {
   })
 })
 
-//  增加
+//  新增文章
 app.get('/add', function (req, res) {
   console.log("/发布请求")
   console.log(req.query)
@@ -106,10 +106,10 @@ app.get('/add', function (req, res) {
   })
 })
 
+// 上传图片
 app.post('/upload', function (req, res) {
   // 上传的文件信息
   console.log(req.files[0])
-
   var des_file = __dirname + "/public/images/" + req.files[0].originalname;
   fs.readFile(req.files[0].path, function (err, data) {
     fs.writeFile(des_file, data, function (err) {
@@ -180,6 +180,22 @@ app.get('/update', function (req, res) {
   })
 })
 
+// 查询机柜数据
+app.get('/cabinet', function (req, res) {
+  console.log("/查询请求")
+  MongoClient.connect(url, function (err, db) {
+    if (err) throw err
+    let dbo = db.db("airbag")
+    let whereStr = {}
+    // 查询条件
+    dbo.collection("cabinet").find(whereStr).toArray(function (e, r) {
+      if (e) throw e
+      console.log(r)
+      res.send(JSON.stringify(r))
+      db.close()
+    })
+  })
+})
 let server = app.listen(8081, function () {
   let host = server.address().address
   let port = server.address().port
