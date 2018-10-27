@@ -197,6 +197,32 @@ app.get('/cabinet', function (req, res) {
   })
 })
 
+// 更新文章
+app.get('/updateCabinet', function (req, res) {
+  console.log("/更新请求")
+  MongoClient.connect(url, function (err, db) {
+    if (err) throw err
+    var dbo = db.db("airbag")
+    var whereStr = {
+    }
+    // 查询条件
+    var updateStr = {
+      $set: {
+        "partSize": req.query.partSize,
+        "describ": JSON.parse(req.query.describ),
+        "equipInfo": JSON.parse(req.query.equipInfo)
+      }
+    }
+    console.log(req.query.describ)
+    dbo.collection("cabinet").updateOne(whereStr, updateStr, function (e, r) {
+      if (e) throw e
+      console.log("机柜更新成功!")
+      res.send(JSON.stringify(r))
+      db.close()
+    })
+  })
+})
+
 let server = app.listen(8081, function () {
   let host = server.address().address
   let port = server.address().port
