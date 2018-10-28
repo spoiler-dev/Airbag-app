@@ -9,10 +9,15 @@ const fs = require("fs")
 const urlencodedParser = bodyParser.urlencoded({ extended: false })
 const multer  = require('multer')
 const ObjectId = require('mongodb').ObjectID
+// g-zip
+const compression = require('compression')
 
-app.use(express.static('public'));
+// g-zip
+app.use(compression())
+app.use(express.static('public'))
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(multer({ dest: '/tmp/'}).array('file'))
+app.use(express.static('dist'))
 
 //  登录
 app.post('/login', urlencodedParser, function (req, res) {
@@ -223,7 +228,7 @@ app.get('/updateCabinet', function (req, res) {
   })
 })
 
-let server = app.listen(8081, function () {
+let server = app.listen(80, function () {
   let host = server.address().address
   let port = server.address().port
   console.log(server.address())
