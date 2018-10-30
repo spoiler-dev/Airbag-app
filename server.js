@@ -30,12 +30,10 @@ app.post('/login', urlencodedParser, function (req, res) {
       "name": req.body.name,
       "password": req.body.password
     }
-    console.log(whereStr)
     // 查询条件
     dbo.collection("user").find(whereStr).toArray(function (e, r) {
       if (e) throw e
       console.log("/登录成功")
-      console.log(r)
       if (r.length > 0) {
         res.send(JSON.stringify({access: true}))
       } else {
@@ -59,7 +57,6 @@ app.get('/list', function (req, res) {
     // 查询条件
     dbo.collection("ulysses").find(whereStr).sort(mysort).toArray(function (e, r) {
       if (e) throw e
-      console.log(r)
       res.send(JSON.stringify(r))
       db.close()
     })
@@ -69,7 +66,6 @@ app.get('/list', function (req, res) {
 //  查询单篇文章
 app.get('/markdown', function (req, res) {
   console.log("/单条请求")
-  console.log(req.query)
   MongoClient.connect(url, function (err, db) {
     if (err) throw err
     let dbo = db.db("airbag")
@@ -81,7 +77,6 @@ app.get('/markdown', function (req, res) {
     console.log(whereStr)
     dbo.collection("ulysses").find(whereStr).toArray(function (e, r) {
       if (e) throw e
-      console.log(r)
       res.send(JSON.stringify(r))
       db.close()
     })
@@ -91,7 +86,6 @@ app.get('/markdown', function (req, res) {
 //  新增文章
 app.get('/add', function (req, res) {
   console.log("/发布请求")
-  console.log(req.query)
   MongoClient.connect(url, function (err, db) {
     if (err) throw err
     var dbo = db.db("airbag")
@@ -114,7 +108,6 @@ app.get('/add', function (req, res) {
 // 上传图片
 app.post('/upload', function (req, res) {
   // 上传的文件信息
-  console.log(req.files[0])
   var des_file = __dirname + "/public/images/" + req.files[0].originalname;
   fs.readFile(req.files[0].path, function (err, data) {
     fs.writeFile(des_file, data, function (err) {
@@ -127,7 +120,6 @@ app.post('/upload', function (req, res) {
           path: "/images/" + req.files[0].originalname
         }
       }
-      console.log(response)
       res.end(JSON.stringify(response))
     })
   })
@@ -175,7 +167,6 @@ app.get('/update', function (req, res) {
         "markdown": req.query.markdown
       }
     }
-    console.log(updateStr)
     dbo.collection("ulysses").updateOne(whereStr, updateStr, function (e, r) {
       if (e) throw e
       console.log("文档更新成功!")
@@ -195,7 +186,6 @@ app.get('/cabinet', function (req, res) {
     // 查询条件
     dbo.collection("cabinet").find(whereStr).toArray(function (e, r) {
       if (e) throw e
-      console.log(r)
       res.send(JSON.stringify(r))
       db.close()
     })
@@ -218,7 +208,6 @@ app.get('/updateCabinet', function (req, res) {
         "equipInfo": JSON.parse(req.query.equipInfo)
       }
     }
-    console.log(req.query.describ)
     dbo.collection("cabinet").updateOne(whereStr, updateStr, function (e, r) {
       if (e) throw e
       console.log("机柜更新成功!")
