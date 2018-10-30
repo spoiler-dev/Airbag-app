@@ -1,8 +1,8 @@
 const express = require('express')
 const app = express()
 const MongoClient = require('mongodb').MongoClient
-// const url = "mongodb://localhost:27017/runoob"
-const url = "mongodb://localhost:27017/"
+// const url = "mongodb://127.0.0.1:27017/runoob"
+const url = "mongodb://0.0.0.0:27017/"
 const bodyParser = require('body-parser')
 const fs = require("fs")
 // 创建 application/x-www-form-urlencoded 编码解析
@@ -228,7 +228,7 @@ app.get('/updateCabinet', function (req, res) {
   })
 })
 
-let server = app.listen(80, function () {
+let server = app.listen(80, '0.0.0.0', function () {
   let host = server.address().address
   let port = server.address().port
   console.log(server.address())
