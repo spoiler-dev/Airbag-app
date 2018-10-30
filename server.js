@@ -20,7 +20,7 @@ app.use(multer({ dest: '/tmp/'}).array('file'))
 app.use(express.static('dist'))
 
 //  登录
-app.post('/api/login', urlencodedParser, function (req, res) {
+app.post('/login', urlencodedParser, function (req, res) {
   console.log("/登录请求")
   // console.log(req)
   MongoClient.connect(url, function (err, db) {
@@ -47,7 +47,7 @@ app.post('/api/login', urlencodedParser, function (req, res) {
 })
 
 //  查询所有文章
-app.get('/api/list', function (req, res) {
+app.get('/list', function (req, res) {
   console.log("/查询请求")
   MongoClient.connect(url, function (err, db) {
     if (err) throw err
@@ -67,7 +67,7 @@ app.get('/api/list', function (req, res) {
 })
 
 //  查询单篇文章
-app.get('/api/markdown', function (req, res) {
+app.get('/markdown', function (req, res) {
   console.log("/单条请求")
   console.log(req.query)
   MongoClient.connect(url, function (err, db) {
@@ -89,7 +89,7 @@ app.get('/api/markdown', function (req, res) {
 })
 
 //  新增文章
-app.get('/api/add', function (req, res) {
+app.get('/add', function (req, res) {
   console.log("/发布请求")
   console.log(req.query)
   MongoClient.connect(url, function (err, db) {
@@ -112,7 +112,7 @@ app.get('/api/add', function (req, res) {
 })
 
 // 上传图片
-app.post('/api/upload', function (req, res) {
+app.post('/upload', function (req, res) {
   // 上传的文件信息
   console.log(req.files[0])
   var des_file = __dirname + "/public/images/" + req.files[0].originalname;
@@ -134,7 +134,7 @@ app.post('/api/upload', function (req, res) {
 })
 
 // 删除文章
-app.get('/api/del', function (req, res) {
+app.get('/del', function (req, res) {
   console.log("/删除请求")
   MongoClient.connect(url, function (err, db) {
     if (err) throw err
@@ -158,7 +158,7 @@ app.get('/api/del', function (req, res) {
 })
 
 // 更新文章
-app.get('/api/update', function (req, res) {
+app.get('/update', function (req, res) {
   console.log("/更新请求")
   MongoClient.connect(url, function (err, db) {
     if (err) throw err
@@ -186,7 +186,7 @@ app.get('/api/update', function (req, res) {
 })
 
 // 查询机柜数据
-app.get('/api/cabinet', function (req, res) {
+app.get('/cabinet', function (req, res) {
   console.log("/查询请求")
   MongoClient.connect(url, function (err, db) {
     if (err) throw err
@@ -203,7 +203,7 @@ app.get('/api/cabinet', function (req, res) {
 })
 
 // 更新文章
-app.get('/api/updateCabinet', function (req, res) {
+app.get('/updateCabinet', function (req, res) {
   console.log("/更新请求")
   MongoClient.connect(url, function (err, db) {
     if (err) throw err
