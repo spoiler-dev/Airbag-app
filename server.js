@@ -246,7 +246,7 @@ app.get('/updateCabinet', function (req, res) {
   })
 })
 
-let server = app.listen(80, '0.0.0.0', function () {
+let server = app.listen(8081, '0.0.0.0', function () {
   let host = server.address().address
   let port = server.address().port
   console.log(server.address())
