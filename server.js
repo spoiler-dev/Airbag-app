@@ -9,20 +9,48 @@ const fs = require("fs")
 const urlencodedParser = bodyParser.urlencoded({ extended: false })
 const multer  = require('multer')
 const ObjectId = require('mongodb').ObjectID
-// g-zip
-const compression = require('compression')
 
-// g-zip
+// g-zip 压缩
+const compression = require('compression')
 app.use(compression())
+
 app.use(express.static('public'))
+
+// extended 为 false 表示使用 querystring 来解析数据，这是 URL-encoded 解析器
 app.use(bodyParser.urlencoded({ extended: false }))
+
+// 文件上传
 app.use(multer({ dest: '/tmp/'}).array('file'))
 app.use(express.static('dist'))
 
-//  登录
+// 日志
+const log4js = require('log4js')
+log4js.configure({
+  appenders: {
+    file: {
+      type: 'dateFile',
+      filename: 'logs/app',
+      pattern: 'yyyy-MM-dd.log',
+      alwaysIncludePattern: true,
+      layout: {
+        type: 'pattern',
+        pattern: '%d{yyyy-MM-dd hh:mm:ss} %p - %m',
+      }
+    }
+  },
+  categories: {
+    default: {
+      appenders: ['file'],
+      level: 'debug'
+    }
+  }
+})
+const logger = log4js.getLogger()
+
+// 用户登录
 app.post('/login', urlencodedParser, function (req, res) {
   console.log("/登录请求")
-  // console.log(req)
+  logger.info('info log ~')
   MongoClient.connect(url, function (err, db) {
     if (err) throw err
     let dbo = db.db("airbag")
@@ -44,8 +72,9 @@ app.post('/login', urlencodedParser, function (req, res) {
   })
 })
 
-//  查询所有文章
+// 查询所有文章
 app.get('/list', function (req, res) {
+  logger.info('info log ~')
   console.log("/查询请求")
   MongoClient.connect(url, function (err, db) {
     if (err) throw err
@@ -63,7 +92,7 @@ app.get('/list', function (req, res) {
   })
 })
 
-//  查询单篇文章
+// 查询单篇文章
 app.get('/markdown', function (req, res) {
   console.log("/单条请求")
   MongoClient.connect(url, function (err, db) {
@@ -83,7 +112,7 @@ app.get('/markdown', function (req, res) {
   })
 })
 
-//  新增文章
+// 新增文章
 app.get('/add', function (req, res) {
   console.log("/发布请求")
   MongoClient.connect(url, function (err, db) {
