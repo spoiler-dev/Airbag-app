@@ -1,13 +1,14 @@
 const express = require('express')
 const app = express()
-const MongoClient = require('mongodb').MongoClient
+// MongoDB 数据库配置
 // const url = "mongodb://127.0.0.1:27017/runoob"
+const MongoClient = require('mongodb').MongoClient
 const url = "mongodb://0.0.0.0:27017/"
 const bodyParser = require('body-parser')
 const fs = require("fs")
 // 创建 application/x-www-form-urlencoded 编码解析
 const urlencodedParser = bodyParser.urlencoded({ extended: false })
-const multer  = require('multer')
+const multer = require('multer')
 const ObjectId = require('mongodb').ObjectID
 
 // g-zip 压缩
@@ -20,7 +21,7 @@ app.use(express.static('public'))
 app.use(bodyParser.urlencoded({ extended: false }))
 
 // 文件上传
-app.use(multer({ dest: '/tmp/'}).array('file'))
+app.use(multer({ dest: '/tmp/' }).array('file'))
 app.use(express.static('dist'))
 
 // 日志
@@ -46,11 +47,15 @@ log4js.configure({
   }
 })
 const logger = log4js.getLogger()
+// logger.debug('debug log ~')
+// logger.info('info log ~')
+// logger.warn('warn log ~')
+// logger.error('error log ~')
+// logger.fatal('fatal log ~')
 
 // 用户登录
 app.post('/login', urlencodedParser, function (req, res) {
-  console.log("/登录请求")
-  logger.info('info log ~')
+  logger.info('>> 登录请求')
   MongoClient.connect(url, function (err, db) {
     if (err) throw err
     let dbo = db.db("airbag")
@@ -61,21 +66,20 @@ app.post('/login', urlencodedParser, function (req, res) {
     // 查询条件
     dbo.collection("user").find(whereStr).toArray(function (e, r) {
       if (e) throw e
-      console.log("/登录成功")
       if (r.length > 0) {
-        res.send(JSON.stringify({access: true}))
+        res.send(JSON.stringify({ access: true }))
       } else {
-        res.send(JSON.stringify({access: false}))
+        res.send(JSON.stringify({ access: false }))
       }
       db.close()
     })
   })
+  logger.info('登录请求 <<')
 })
 
 // 查询所有文章
 app.get('/list', function (req, res) {
-  logger.info('info log ~')
-  console.log("/查询请求")
+  logger.info('>> 查询全部文章')
   MongoClient.connect(url, function (err, db) {
     if (err) throw err
     let dbo = db.db("airbag")
@@ -90,11 +94,12 @@ app.get('/list', function (req, res) {
       db.close()
     })
   })
+  logger.info('查询全部文章 <<')
 })
 
 // 查询单篇文章
 app.get('/markdown', function (req, res) {
-  console.log("/单条请求")
+  logger.info('>> 查询单篇文章')
   MongoClient.connect(url, function (err, db) {
     if (err) throw err
     let dbo = db.db("airbag")
@@ -103,18 +108,19 @@ app.get('/markdown', function (req, res) {
       "flag": 0
     }
     // 查询条件
-    console.log(whereStr)
+    logger.debug(whereStr)
     dbo.collection("ulysses").find(whereStr).toArray(function (e, r) {
       if (e) throw e
       res.send(JSON.stringify(r))
       db.close()
     })
   })
+  logger.info('查询单篇文章 <<')
 })
 
 // 新增文章
 app.get('/add', function (req, res) {
-  console.log("/发布请求")
+  logger.info('>> 新增文章')
   MongoClient.connect(url, function (err, db) {
     if (err) throw err
     var dbo = db.db("airbag")
@@ -127,21 +133,22 @@ app.get('/add', function (req, res) {
     }
     dbo.collection("ulysses").insertOne(myobj, function (e, r) {
       if (e) throw e
-      console.log("文章发布成功!")
       res.send('文章发布成功!')
       db.close()
     })
   })
+  logger.info('新增文章 <<')
 })
 
 // 上传图片
 app.post('/upload', function (req, res) {
   // 上传的文件信息
+  logger.info('>> 上传图片')
   var des_file = __dirname + "/public/images/" + req.files[0].originalname;
   fs.readFile(req.files[0].path, function (err, data) {
     fs.writeFile(des_file, data, function (err) {
       if (err) {
-        console.log(err)
+        logger.error(err)
       } else {
         response = {
           message: '文件上传成功!',
@@ -152,11 +159,12 @@ app.post('/upload', function (req, res) {
       res.end(JSON.stringify(response))
     })
   })
+  logger.info('上传图片 <<')
 })
 
 // 删除文章
 app.get('/del', function (req, res) {
-  console.log("/删除请求")
+  logger.info('>> 删除文章')
   MongoClient.connect(url, function (err, db) {
     if (err) throw err
     var dbo = db.db("airbag")
@@ -171,16 +179,16 @@ app.get('/del', function (req, res) {
     }
     dbo.collection("ulysses").updateOne(whereStr, updateStr, function (e, r) {
       if (e) throw e
-      console.log("文档删除成功!")
       res.send(JSON.stringify(r))
       db.close()
     })
   })
+  logger.info('删除文章 <<')
 })
 
 // 更新文章
 app.get('/update', function (req, res) {
-  console.log("/更新请求")
+  logger.info('>> 更新文章')
   MongoClient.connect(url, function (err, db) {
     if (err) throw err
     var dbo = db.db("airbag")
@@ -198,16 +206,16 @@ app.get('/update', function (req, res) {
     }
     dbo.collection("ulysses").updateOne(whereStr, updateStr, function (e, r) {
       if (e) throw e
-      console.log("文档更新成功!")
       res.send(JSON.stringify(r))
       db.close()
     })
   })
+  logger.info('更新文章 <<')
 })
 
 // 查询机柜数据
 app.get('/cabinet', function (req, res) {
-  console.log("/查询请求")
+  logger.info('>> 查询机柜数据')
   MongoClient.connect(url, function (err, db) {
     if (err) throw err
     let dbo = db.db("airbag")
@@ -219,11 +227,12 @@ app.get('/cabinet', function (req, res) {
       db.close()
     })
   })
+  logger.info('查询机柜数据 <<')
 })
 
-// 更新文章
+// 更新机柜信息
 app.get('/updateCabinet', function (req, res) {
-  console.log("/更新请求")
+  logger.info('>> 更新机柜信息')
   MongoClient.connect(url, function (err, db) {
     if (err) throw err
     var dbo = db.db("airbag")
@@ -239,18 +248,19 @@ app.get('/updateCabinet', function (req, res) {
     }
     dbo.collection("cabinet").updateOne(whereStr, updateStr, function (e, r) {
       if (e) throw e
-      console.log("机柜更新成功!")
       res.send(JSON.stringify(r))
       db.close()
     })
   })
+  logger.info('更新机柜信息 <<')
 })
 
+
+
+// 启动实例
 let server = app.listen(8081, '0.0.0.0', function () {
   let host = server.address().address
   let port = server.address().port
-  console.log(server.address())
-  console.log(host)
-  console.log(port)
-  console.log("应用实例成功，访问地址为 http://%s:%s", host, port)
+  logger.info(":::::::::: START ::::::::::\n应用成功,访问地址为 http://%s:%s", host, port)
+  console.log(":::::::::: START ::::::::::\n应用成功,访问地址为 http://%s:%s", host, port)
 })
