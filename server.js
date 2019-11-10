@@ -124,7 +124,7 @@ app.get('/markdown', function (req, res) {
 })
 
 // 新增文章
-app.get('/add', function (req, res) {
+app.post('/add', function (req, res) {
   logger.info('>> 新增文章')
   MongoClient.connect(url, function (err, db) {
     if (err) throw err
@@ -192,7 +192,7 @@ app.get('/del', function (req, res) {
 })
 
 // 更新文章
-app.get('/update', function (req, res) {
+app.post('/update', function (req, res) {
   logger.info('>> 更新文章')
   MongoClient.connect(url, function (err, db) {
     if (err) throw err
