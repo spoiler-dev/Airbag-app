@@ -12,7 +12,6 @@ const multer = require('multer')
 const ObjectId = require('mongodb').ObjectID
 
 // HTTP 请求上传参数最大限制修改
-var bodyParser = require('body-parser');
 app.use(bodyParser.json({limit: '100mb'}));
 app.use(bodyParser.urlencoded({limit: '100mb', extended: true}));
 app.use(express.json({limit: '100mb'}));
