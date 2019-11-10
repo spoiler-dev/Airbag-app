@@ -15,6 +15,10 @@ const ObjectId = require('mongodb').ObjectID
 const compression = require('compression')
 app.use(compression())
 
+// HTTP 请求上传参数最大限制修改
+app.use(bodyParser.json({limit:'100mb'}));
+app.use(bodyParser.urlencoded({ limit:'100mb', extended: true }));
+
 app.use(express.static('public'))
 
 // extended 为 false 表示使用 querystring 来解析数据，这是 URL-encoded 解析器
