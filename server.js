@@ -15,6 +15,7 @@ const ObjectId = require('mongodb').ObjectID
 var bodyParser = require('body-parser');
 app.use(bodyParser.json({limit: '100mb'}));
 app.use(bodyParser.urlencoded({limit: '100mb', extended: true}));
+app.use(express.json({limit: '100mb'}));
 
 // g-zip 压缩
 const compression = require('compression')
