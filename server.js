@@ -77,29 +77,38 @@ app.post('/login', urlencodedParser, function (req, res) {
         res.send(JSON.stringify({ access: false }))
       }
       db.close()
+      logger.info('登录请求 <<')
     })
   })
-  logger.info('登录请求 <<')
 })
 
-// 查询所有文章
-app.get('/list', function (req, res) {
-  logger.info('>> 查询全部文章')
+// 查询所有文章 (分页)
+app.post('/list', urlencodedParser, function (req, res) {
+  logger.info('>> 查询全部文章 (分页)')
   MongoClient.connect(url, function (err, db) {
     if (err) throw err
     let dbo = db.db("airbag")
     let whereStr = {
       "flag": 0
     }
-    var mysort = { date: -1 }
+    let index = parseInt(req.body.index)
+    let size = parseInt(req.body.size)
+    let num = index * size
+    let mysort = { date: -1 }
+    let total = null
     // 查询条件
-    dbo.collection("ulysses").find(whereStr).sort(mysort).toArray(function (e, r) {
+    dbo.collection("ulysses").find(whereStr).sort(mysort).limit(size).skip(num).toArray(function (e, r) {
       if (e) throw e
-      res.send(JSON.stringify(r))
-      db.close()
+      dbo.collection("ulysses").aggregate([{$group : {_id: "$flag", total : {$sum : 1}}}]).toArray(function (er, re) {
+        if (er) throw er
+        total = re
+        r.push(total)
+        res.send(JSON.stringify(r))
+        db.close()
+        logger.info('查询全部文章 (分页) <<')
+      })
     })
   })
-  logger.info('查询全部文章 <<')
 })
 
 // 查询单篇文章
@@ -118,18 +127,18 @@ app.get('/markdown', function (req, res) {
       if (e) throw e
       res.send(JSON.stringify(r))
       db.close()
+      logger.info('查询单篇文章 <<')
     })
   })
-  logger.info('查询单篇文章 <<')
 })
 
 // 新增文章
-app.post('/add', function (req, res) {
+app.post('/add', urlencodedParser, function (req, res) {
   logger.info('>> 新增文章')
   MongoClient.connect(url, function (err, db) {
     if (err) throw err
-    var dbo = db.db("airbag")
-    var myobj = {
+    let dbo = db.db("airbag")
+    let myobj = {
       "title": req.query.title,
       "path": req.query.path,
       "date": req.query.date,
@@ -140,16 +149,16 @@ app.post('/add', function (req, res) {
       if (e) throw e
       res.send('文章发布成功!')
       db.close()
+      logger.info('新增文章 <<')
     })
   })
-  logger.info('新增文章 <<')
 })
 
 // 上传图片
 app.post('/upload', function (req, res) {
   // 上传的文件信息
   logger.info('>> 上传图片')
-  var des_file = __dirname + "/public/images/" + req.files[0].originalname;
+  let des_file = __dirname + "/public/images/" + req.files[0].originalname;
   fs.readFile(req.files[0].path, function (err, data) {
     fs.writeFile(des_file, data, function (err) {
       if (err) {
@@ -162,9 +171,9 @@ app.post('/upload', function (req, res) {
         }
       }
       res.end(JSON.stringify(response))
+      logger.info('上传图片 <<')
     })
   })
-  logger.info('上传图片 <<')
 })
 
 // 删除文章
@@ -172,12 +181,12 @@ app.get('/del', function (req, res) {
   logger.info('>> 删除文章')
   MongoClient.connect(url, function (err, db) {
     if (err) throw err
-    var dbo = db.db("airbag")
-    var whereStr = {
+    let dbo = db.db("airbag")
+    let whereStr = {
       "_id": ObjectId(req.query.id)
     }
     // 查询条件
-    var updateStr = {
+    let updateStr = {
       $set: {
         "flag": 1
       }
@@ -186,36 +195,36 @@ app.get('/del', function (req, res) {
       if (e) throw e
       res.send(JSON.stringify(r))
       db.close()
+      logger.info('删除文章 <<')
     })
   })
-  logger.info('删除文章 <<')
 })
 
 // 更新文章
-app.post('/update', function (req, res) {
+app.post('/update', urlencodedParser, function (req, res) {
   logger.info('>> 更新文章')
   MongoClient.connect(url, function (err, db) {
     if (err) throw err
-    var dbo = db.db("airbag")
-    var whereStr = {
-      "_id": ObjectId(req.query.id)
+    let dbo = db.db("airbag")
+    let whereStr = {
+      "_id": ObjectId(req.body.id)
     }
     // 查询条件
-    var updateStr = {
+    let updateStr = {
       $set: {
-        "title": req.query.title,
-        "path": req.query.path,
-        "date": req.query.date,
-        "markdown": req.query.markdown
+        "title": req.body.title,
+        "path": req.body.path,
+        "date": req.body.date,
+        "markdown": req.body.markdown
       }
     }
     dbo.collection("ulysses").updateOne(whereStr, updateStr, function (e, r) {
       if (e) throw e
       res.send(JSON.stringify(r))
       db.close()
+      logger.info('更新文章 <<')
     })
   })
-  logger.info('更新文章 <<')
 })
 
 // 查询机柜数据
@@ -230,9 +239,9 @@ app.get('/cabinet', function (req, res) {
       if (e) throw e
       res.send(JSON.stringify(r))
       db.close()
+      logger.info('查询机柜数据 <<')
     })
   })
-  logger.info('查询机柜数据 <<')
 })
 
 // 更新机柜信息
@@ -240,11 +249,11 @@ app.get('/updateCabinet', function (req, res) {
   logger.info('>> 更新机柜信息')
   MongoClient.connect(url, function (err, db) {
     if (err) throw err
-    var dbo = db.db("airbag")
-    var whereStr = {
+    let dbo = db.db("airbag")
+    let whereStr = {
     }
     // 查询条件
-    var updateStr = {
+    let updateStr = {
       $set: {
         "partSize": req.query.partSize,
         "describ": JSON.parse(req.query.describ),
@@ -255,9 +264,9 @@ app.get('/updateCabinet', function (req, res) {
       if (e) throw e
       res.send(JSON.stringify(r))
       db.close()
+      logger.info('更新机柜信息 <<')
     })
   })
-  logger.info('更新机柜信息 <<')
 })
 
 
