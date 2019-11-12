@@ -159,10 +159,10 @@ app.post('/add', urlencodedParser, function (req, res) {
     if (err) throw err
     let dbo = db.db("airbag")
     let myobj = {
-      "title": req.query.title,
-      "path": req.query.path,
-      "date": req.query.date,
-      "markdown": req.query.markdown,
+      "title": req.body.title,
+      "path": req.body.path,
+      "date": req.body.date,
+      "markdown": req.body.markdown,
       "flag": 0
     }
     dbo.collection("ulysses").insertOne(myobj, function (e, r) {
