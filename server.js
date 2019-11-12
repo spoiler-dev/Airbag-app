@@ -77,13 +77,33 @@ app.post('/login', urlencodedParser, function (req, res) {
         res.send(JSON.stringify({ access: false }))
       }
       db.close()
-      logger.info('登录请求 <<')
+      logger.info('登录成功 <<')
+    })
+  })
+})
+
+// 查询所有文章
+app.get('/list', function (req, res) {
+  logger.info('>> 查询全部文章列表')
+  MongoClient.connect(url, function (err, db) {
+    if (err) throw err
+    let dbo = db.db("airbag")
+    let whereStr = {
+      "flag": 0
+    }
+    var mysort = { date: -1 }
+    // 查询条件
+    dbo.collection("ulysses").find(whereStr).sort(mysort).toArray(function (e, r) {
+      if (e) throw e
+      res.send(JSON.stringify(r))
+      db.close()
+      logger.info('查询全部文章列表成功 <<')
     })
   })
 })
 
 // 查询所有文章 (分页)
-app.post('/list', urlencodedParser, function (req, res) {
+app.post('/pager', urlencodedParser, function (req, res) {
   logger.info('>> 查询全部文章 (分页)')
   MongoClient.connect(url, function (err, db) {
     if (err) throw err
@@ -105,7 +125,7 @@ app.post('/list', urlencodedParser, function (req, res) {
         r.push(total)
         res.send(JSON.stringify(r))
         db.close()
-        logger.info('查询全部文章 (分页) <<')
+        logger.info('查询全部文章成功 (分页) <<')
       })
     })
   })
@@ -127,7 +147,7 @@ app.get('/markdown', function (req, res) {
       if (e) throw e
       res.send(JSON.stringify(r))
       db.close()
-      logger.info('查询单篇文章 <<')
+      logger.info('查询单篇文章成功 <<')
     })
   })
 })
@@ -149,7 +169,7 @@ app.post('/add', urlencodedParser, function (req, res) {
       if (e) throw e
       res.send('文章发布成功!')
       db.close()
-      logger.info('新增文章 <<')
+      logger.info('新增文章成功 <<')
     })
   })
 })
@@ -158,7 +178,7 @@ app.post('/add', urlencodedParser, function (req, res) {
 app.post('/upload', function (req, res) {
   // 上传的文件信息
   logger.info('>> 上传图片')
-  let des_file = __dirname + "/public/images/" + req.files[0].originalname;
+  let des_file = __dirname + "\\public\\images\\" + req.files[0].originalname
   fs.readFile(req.files[0].path, function (err, data) {
     fs.writeFile(des_file, data, function (err) {
       if (err) {
@@ -171,8 +191,20 @@ app.post('/upload', function (req, res) {
         }
       }
       res.end(JSON.stringify(response))
-      logger.info('上传图片 <<')
+      logger.info('上传图片成功 <<')
     })
+  })
+})
+
+// 删除图片
+app.get('/remove', function (req, res) {
+  logger.info(">> 图片删除")
+  let des_file = __dirname + "\\public\\images\\" + req.query.fileName
+  fs.unlink(des_file, function(err) {
+    if (err) {
+      logger.error(err)
+    }
+    logger.info("图片删除成功 <<")
   })
 })
 
@@ -195,7 +227,7 @@ app.get('/del', function (req, res) {
       if (e) throw e
       res.send(JSON.stringify(r))
       db.close()
-      logger.info('删除文章 <<')
+      logger.info('删除文章成功 <<')
     })
   })
 })
@@ -222,7 +254,7 @@ app.post('/update', urlencodedParser, function (req, res) {
       if (e) throw e
       res.send(JSON.stringify(r))
       db.close()
-      logger.info('更新文章 <<')
+      logger.info('更新文章成功 <<')
     })
   })
 })
@@ -239,7 +271,7 @@ app.get('/cabinet', function (req, res) {
       if (e) throw e
       res.send(JSON.stringify(r))
       db.close()
-      logger.info('查询机柜数据 <<')
+      logger.info('查询机柜数据成功 <<')
     })
   })
 })
@@ -264,7 +296,7 @@ app.get('/updateCabinet', function (req, res) {
       if (e) throw e
       res.send(JSON.stringify(r))
       db.close()
-      logger.info('更新机柜信息 <<')
+      logger.info('更新机柜信息成功 <<')
     })
   })
 })
